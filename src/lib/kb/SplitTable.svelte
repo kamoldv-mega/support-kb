@@ -9,7 +9,7 @@
   let { ticket }: { ticket: number } = $props();
 
   const split = $derived(splitTicket(reports as Report[], ticket, tenantOf, notes.oneDayMove));
-  const tickets = filed.tickets as Record<string, { number: number; title: string }>;
+  const tickets = filed.tickets as Record<string, { number: number; title: string; resolution?: string }>;
   const issue = (p: Problem) => tickets[p];
   const href = (n: number) => `https://github.com/${filed.repo}/issues/${n}`;
   const channels = (c: Record<string, number>) =>
@@ -41,7 +41,7 @@
         <td>{g.tenants.length}</td>
         <td class="small">{channels(g.channels)}</td>
         <td class="small">{g.firstSeen} → {g.lastSeen}</td>
-        <td>{#if t}<a href={href(t.number)}>#{t.number}</a> {t.title}{:else}no ticket yet{/if}</td>
+        <td>{#if t}<a href={href(t.number)}>#{t.number}</a> {t.title}{#if t.resolution}<br /><span class="small">closed: {t.resolution}</span>{/if}{:else}no ticket yet{/if}</td>
       </tr>
     {/each}
   </tbody>

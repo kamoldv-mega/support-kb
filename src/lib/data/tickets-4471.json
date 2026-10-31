@@ -3,15 +3,18 @@
   "tickets": {
     "parser": {
       "number": 1,
-      "title": "[4471] Shared date parser reads day-first dates month-first (day and month swapped) (379 reports)"
+      "title": "[4471] Shared date parser reads day-first dates month-first (day and month swapped) (379 reports)",
+      "resolution": "fixed \u00b7 fix(dates): parse dd/mm for eu locales"
     },
     "hint": {
       "number": 2,
-      "title": "[4471] booking-v3 web form shows an MM/DD/YYYY hint but reads the date day-first (33 reports)"
+      "title": "[4471] booking-v3 web form shows an MM/DD/YYYY hint but reads the date day-first (33 reports)",
+      "resolution": "won't fix \u00b7 booking-v3 form retired"
     },
     "one-day": {
       "number": 3,
-      "title": "[4471] Booking shown one day off (timezone shift), not a day/month swap (5 reports)"
+      "title": "[4471] Booking shown one day off (timezone shift), not a day/month swap (5 reports)",
+      "resolution": "duplicate of #1 (counted under parser)"
     }
   }
 }

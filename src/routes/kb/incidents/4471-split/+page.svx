@@ -2,7 +2,7 @@
 layout: runbook
 title: '#4471 · three problems, not one'
 owner: kamoldv-mega
-status: open
+status: closed
 reviewed: 2026-10-31
 signature: v1.eyJzdWIiOiI3NTM0IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTM0MzA0NzEsImV4cCI6MTc5MzUxNjg3MX0.sfoNGrUMehHu2_fcg1DUpSnqjQS-qiHvkKkXc-1-CS8
 ---
@@ -18,8 +18,9 @@ signature: v1.eyJzdWIiOiI3NTM0IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYX
 the reports by where they came in and what they say, and #4471 holds three problems. The queued
 parser fix closes only the first. Each problem now has its own ticket.
 
-<Callout kind="warn">
-Not known. Three problems, one fix queued. The other two stay open until they have their own fixes.
+<Callout>
+Closed 5 Oct. `parser` is fixed (`fix(dates): parse dd/mm for eu locales`). `hint` won't be fixed,
+because the booking-v3 form was retired. `one-day` was closed as part of `parser`, where the desk counts it.
 </Callout>
 
 ## The split
@@ -66,9 +67,19 @@ it came in, and misses booking-v3 form reports sent from day-first browsers.
 - `one-day` lists the reports the desk's notes read as a one-day move. They are a subset of the
   `parser` count, not added to the total.
 
+## Resolution
+
+Engineering closed #4471 on 5 October:
+
+- **`parser`: fixed** by `fix(dates): parse dd/mm for eu locales`. Ticket #1 is closed as completed.
+- **`hint`: won't fix.** The booking-v3 form is retired, so its `MM/DD/YYYY` hint is gone too.
+  Ticket #2 is closed as not planned.
+- **`one-day`** is closed as a duplicate of #1, because the desk counts these reports under `parser`.
+  But they are not a day/month swap, so the dd/mm fix may not reach them. If reports of a date moving
+  by one day keep coming after the fix, reopen #3 as a time zone bug.
+
 ## Next
 
 - Decision 0001 should be replaced by a new record: merge by cause, not by subject.
-- Re-check this page against a fresh export before closing any of the three tickets.
 
 <RenderStamp {signature} />
