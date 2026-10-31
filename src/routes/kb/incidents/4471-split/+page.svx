@@ -41,8 +41,9 @@ must read what it asks for). Only form reports from booking-v3 tenants.
 **`one-day`: the date moves by exactly one day.** No month is swapped. Tuesday shows as Monday,
 an invite arrives before the booking was made, and two clients in different time zones get two
 different days for the same meeting. That is a time zone bug: a date-only value turned into an
-instant and back. The desk already noted these reports (`desk-notes.json` → `oneDayMove`) but
-counted them under `parser` because of their tenant. The parser fix will not move them back.
+instant and back. The desk already noted these reports (`desk-notes.json` → `oneDayMove`). They are
+filed, and counted, under `parser` because of their tenant, which is why `parser` and `one-day` overlap
+in the table. The parser fix will not move them back, so they have their own ticket.
 
 ## Why one ticket held three
 
@@ -60,9 +61,10 @@ it came in, and misses booking-v3 form reports sent from day-first browsers.
 - Numbers on this page come from `#lib/kb/split` at render time, over the export in
   `src/lib/data`. When the desk merges more reports or adds to its notes, rebuild and the page follows.
 - One id, one report: the export pages overlap, so repeated ids count once.
-- A report is `one-day` when the desk's notes list it; otherwise its cause comes from
-  `causes.ts` (tenant locale, booking form, channel). A report with no tenant on file would show as
-  `unplaced`.
+- Counted the way the desk counts: every report is counted where it is filed, by `causes.ts`
+  (tenant locale, booking form, channel). A report with no tenant on file would show as `unplaced`.
+- `one-day` lists the reports the desk's notes read as a one-day move. They are a subset of the
+  `parser` count, not added to the total.
 
 ## Next
 

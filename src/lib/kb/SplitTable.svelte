@@ -25,6 +25,9 @@
   {split.groups.length === 1 ? 'problem' : 'problems'}
 </p>
 
+<p class="small">Counted the desk's way: a report counts where it is filed (by tenant and channel,
+  <code>causes.ts</code>). Reports the desk reads as something else are shown again under that problem and footnoted.</p>
+
 <table>
   <thead>
     <tr><th>problem</th><th>reports</th><th>tenants</th><th>channels</th><th>seen</th><th>ticket</th></tr>
@@ -34,7 +37,7 @@
       {@const t = issue(g.problem)}
       <tr class:open={!t}>
         <td><code>{g.problem}</code></td>
-        <td><strong>{g.ids.length}</strong></td>
+        <td><strong>{g.ids.length}</strong>{#if g.filedUnder}<br /><span class="small">also counted in <code>{g.filedUnder}</code></span>{/if}</td>
         <td>{g.tenants.length}</td>
         <td class="small">{channels(g.channels)}</td>
         <td class="small">{g.firstSeen} → {g.lastSeen}</td>
@@ -43,7 +46,7 @@
     {/each}
   </tbody>
   <tfoot>
-    <tr><td>total</td><td><strong>{split.groups.reduce((n, g) => n + g.ids.length, 0)}</strong></td><td colspan="4"></td></tr>
+    <tr><td>total</td><td><strong>{split.groups.filter((g) => !g.filedUnder).reduce((n, g) => n + g.ids.length, 0)}</strong></td><td colspan="4"></td></tr>
   </tfoot>
 </table>
 

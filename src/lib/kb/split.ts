@@ -1,8 +1,9 @@
 // Split a merged ticket into the problems its reports really hold.
 // causes.ts places a report by tenant and channel (parser | hint). The desk's own notes
 // (desk-notes.json → oneDayMove) list reports that are not a day/month flip at all: the date
-// moved by exactly one day. Those are a third problem, so they get their own place here
-// instead of being counted under the cause their tenant would suggest.
+// moved by exactly one day. Those are a third problem with its own ticket, but the desk counts a
+// report where it is filed (causes.ts → readAs): so they stay counted under their tenant's cause
+// and are shown again, as a subset, under `one-day`.
 import { causeOf, uniqueById, type Report, type Tenant } from '#lib/kb/causes';
 
 export type Problem = 'parser' | 'hint' | 'one-day' | 'unplaced';
@@ -14,6 +15,7 @@ export function problemOf(r: Report, t: Tenant | undefined, oneDay: readonly str
 
 export type ProblemGroup = {
   problem: Problem;
+  filedUnder?: Problem; // set when these reports are also counted under another problem
   ids: string[];
   tenants: string[];
   channels: Record<string, number>;
@@ -39,10 +41,11 @@ export function splitTicket(
   const merged = uniqueById(rows);
   const by = new Map<Problem, Report[]>();
   for (const r of merged) {
-    const p = problemOf(r, tenantOf(r), oneDay);
-    by.set(p, [...(by.get(p) ?? []), r]);
+    const filed = causeOf(r, tenantOf(r)) ?? 'unplaced';
+    by.set(filed, [...(by.get(filed) ?? []), r]);
   }
-  const groups = [...by.entries()]
+  const moved = merged.filter((r) => oneDay.includes(r.id));
+  const groups: ProblemGroup[] = [...by.entries()]
     .map(([problem, rs]) => {
       const days = rs.map((r) => r.receivedAt.slice(0, 10)).sort();
       return {
@@ -55,7 +58,21 @@ export function splitTicket(
         lastSeen: days[days.length - 1],
       };
     })
-    .sort((a, b) => b.ids.length - a.ids.length);
+    .sort((a, b) => b.ids.length - a.ids.length) as ProblemGroup[];
+  if (moved.length) {
+    const days = moved.map((r) => r.receivedAt.slice(0, 10)).sort();
+    const under = [...new Set(moved.map((r) => causeOf(r, tenantOf(r)) ?? 'unplaced'))];
+    groups.push({
+      problem: 'one-day',
+      filedUnder: under.length === 1 ? under[0] : undefined,
+      ids: moved.map((r) => r.id).sort(),
+      tenants: [...new Set(moved.map((r) => r.tenant))].sort(),
+      channels: moved.reduce<Record<string, number>>((n, r) => ({ ...n, [r.channel]: (n[r.channel] ?? 0) + 1 }), {}),
+      subjects: new Set(moved.map((r) => normSubject(r.subject))).size,
+      firstSeen: days[0],
+      lastSeen: days[days.length - 1],
+    });
+  }
 
   const bySubject = new Map<string, Report[]>();
   for (const r of merged) bySubject.set(normSubject(r.subject), [...(bySubject.get(normSubject(r.subject)) ?? []), r]);
