@@ -34,3 +34,13 @@ Support desk. Decision records: whoever signed them.
 ---
 
 Exported 2026-10-04 from the `support` repo, `apps/kb/` → `src/`.
+
+## Running it
+
+```
+npm install
+npm run build      # renders every page to build/ (static HTML, no JS)
+```
+
+`docs/` holds the rendered site as the desk sees it, committed. The #4471 split lives at
+`src/routes/kb/incidents/4471-split/+page.svx`, rendered at `docs/kb/incidents/4471-split/index.html`.

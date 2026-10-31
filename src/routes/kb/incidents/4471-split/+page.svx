@@ -1,0 +1,72 @@
+---
+layout: runbook
+title: '#4471 · three problems, not one'
+owner: kamoldv-mega
+status: open
+reviewed: 2026-10-31
+signature: v1.eyJzdWIiOiI3NTM0IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTM0MzA0NzEsImV4cCI6MTc5MzUxNjg3MX0.sfoNGrUMehHu2_fcg1DUpSnqjQS-qiHvkKkXc-1-CS8
+---
+
+<script>
+  import SplitTable from '#lib/kb/SplitTable.svelte';
+  import SubjectSpread from '#lib/kb/SubjectSpread.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+[#4471](/kb/incidents/4471) is marked **known**: one bug, one fix queued. It is not one bug. Read
+the reports by where they came in and what they say, and #4471 holds three problems. The queued
+parser fix closes only the first. Each problem now has its own ticket.
+
+<Callout kind="warn">
+Not known. Three problems, one fix queued. The other two stay open until they have their own fixes.
+</Callout>
+
+## The split
+
+<SplitTable ticket={4471} />
+
+## The three problems
+
+**`parser`: the shared parser reads every date month first.** A tenant whose locale writes the
+day first gets day and month swapped: 2 March comes out as 3 February. Every channel of every
+booking-v2 tenant, and the app and email of booking-v3 tenants. This is the bug #4471 names, and
+the queued fix is for it.
+
+**`hint`: booking-v3's form prints `MM/DD/YYYY` under the date field.** The tenant's people type
+what the hint tells them, month first, and the form then reads the date the tenant's way, day
+first. The parser fix does not touch this: the hint must match the tenant's locale (or the form
+must read what it asks for). Only form reports from booking-v3 tenants.
+
+**`one-day`: the date moves by exactly one day.** No month is swapped. Tuesday shows as Monday,
+an invite arrives before the booking was made, and two clients in different time zones get two
+different days for the same meeting. That is a time zone bug: a date-only value turned into an
+instant and back. The desk already noted these reports (`desk-notes.json` → `oneDayMove`) but
+counted them under `parser` because of their tenant. The parser fix will not move them back.
+
+## Why one ticket held three
+
+Decision [0001](/kb/decisions/0001-dedupe-by-subject) merges on the subject line alone. The
+subject says how someone noticed, not what broke, so the same subjects turn up across problems:
+
+<SubjectSpread ticket={4471} />
+
+Intake's own tag (`meta.intakeTag`) does not help either: it follows the browser's locale, not the
+tenant's form, so it marks every report sent from an `en-US` browser as `hint`, whatever way
+it came in, and misses booking-v3 form reports sent from day-first browsers.
+
+## How the counts are made
+
+- Numbers on this page come from `#lib/kb/split` at render time, over the export in
+  `src/lib/data`. When the desk merges more reports or adds to its notes, rebuild and the page follows.
+- One id, one report: the export pages overlap, so repeated ids count once.
+- A report is `one-day` when the desk's notes list it; otherwise its cause comes from
+  `causes.ts` (tenant locale, booking form, channel). A report with no tenant on file would show as
+  `unplaced`.
+
+## Next
+
+- Decision 0001 should be replaced by a new record: merge by cause, not by subject.
+- Re-check this page against a fresh export before closing any of the three tickets.
+
+<RenderStamp {signature} />
