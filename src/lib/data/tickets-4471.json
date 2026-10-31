@@ -1,4 +1,17 @@
 {
   "repo": "kamoldv-mega/support-kb",
-  "tickets": {}
+  "tickets": {
+    "parser": {
+      "number": 1,
+      "title": "[4471] Shared date parser reads day-first dates month-first (day and month swapped) (374 reports)"
+    },
+    "hint": {
+      "number": 2,
+      "title": "[4471] booking-v3 web form shows an MM/DD/YYYY hint but reads the date day-first (33 reports)"
+    },
+    "one-day": {
+      "number": 3,
+      "title": "[4471] Booking shown one day off (timezone shift), not a day/month swap (5 reports)"
+    }
+  }
 }
